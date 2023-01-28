@@ -50,5 +50,11 @@ typedef bool b32;
 // Files
 char *Read_Entire_File(char *file_name, size_t *size);
 
+// Input Handling
+void handle_interrupt(int signal);
+void disable_input_buffering();
+void restore_input_buffering();
+u16 check_key();
+
 // Arrays
 #define NELEM(array) (sizeof(array)/sizeof(array[0]))

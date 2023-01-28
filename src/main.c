@@ -4,6 +4,8 @@
 int
 main(int argc, const char* argv[])
 {
+	signal(SIGINT, handle_interrupt);
+	disable_input_buffering();
 	if ( argc < 2 )
 	{
 		printf("lc3 [image-file1] ...\n");
@@ -12,7 +14,7 @@ main(int argc, const char* argv[])
 
 	for (int i = 1; i < argc; ++i)
 	{
-		if (!read_image(argv[i]))
+		if (!VM_ReadImage(argv[i]))
 		{
 			printf("Failed to read image: %s\n", argv[i]);
 			exit(1);
@@ -23,5 +25,8 @@ main(int argc, const char* argv[])
 
 	VM_Run();
 
-	return VM_Shutdown();
+	int res =  VM_Shutdown();
+	restore_input_buffering();
+
+	return res;
 }
