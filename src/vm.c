@@ -49,7 +49,7 @@ mem_read(u16 address)
 		if (check_key())
 		{
 			mem[MR_KBSR] = (1 << 15);
-			mem[MR_KBDR] = getchar();
+			mem[MR_KBDR] = (u16)getchar();
 		}
 		else
 			mem[MR_KBSR] = 0;
@@ -96,10 +96,10 @@ op_ldi(u16 instr)
 
 	// The address at the offset + PC
 	u16 ad1 = mem_read(ad0);
-	u16 mem = mem_read(ad1);
+	u16 mr0 = mem_read(ad1);
 
 	// writing the memory
-	reg[dr] = mem;
+	reg[dr] = mr0;
 
 	// Updating the flags
 	update_flags(dr);
@@ -321,7 +321,7 @@ op_trap(u16 instr)
 		case TRAP_IN:
 		{
 			printf("Enter a character: ");
-			char c = getchar();
+			char c = (char)getchar();
 			putc(c, stdout);
 			fflush(stdout);
 			reg[R_R0] = (u16)c;
@@ -369,7 +369,7 @@ read_image_file(FILE *file)
 	fread(&origin, sizeof(origin), 1, file);
 	origin = swap16(origin);
 
-	u16 max_read = MAX_MEMORY - origin;
+	u16 max_read = (u16)(MAX_MEMORY - origin);
 	u16 *p = mem + origin;
 	size_t read = fread(p, sizeof(u16), max_read, file);
 

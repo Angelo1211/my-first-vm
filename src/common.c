@@ -1,7 +1,35 @@
 #include "common.h"
 
 #include <signal.h>
-/* unix only */
+
+#if WIN32
+#include <Windows.h>
+#include <conio.h>  // _kbhit
+HANDLE hStdin = INVALID_HANDLE_VALUE;
+DWORD fdwMode, fdwOldMode;
+
+void disable_input_buffering()
+{
+    hStdin = GetStdHandle(STD_INPUT_HANDLE);
+    GetConsoleMode(hStdin, &fdwOldMode); /* save old mode */
+    fdwMode = fdwOldMode
+            ^ ENABLE_ECHO_INPUT  /* no input echo */
+            ^ ENABLE_LINE_INPUT; /* return when one or
+                                    more characters are available */
+    SetConsoleMode(hStdin, fdwMode); /* set new mode */
+    FlushConsoleInputBuffer(hStdin); /* clear buffer */
+}
+
+void restore_input_buffering()
+{
+    SetConsoleMode(hStdin, fdwOldMode);
+}
+
+uint16_t check_key()
+{
+    return WaitForSingleObject(hStdin, 1000) == WAIT_OBJECT_0 && _kbhit();
+}
+#else // unix only
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -9,17 +37,7 @@
 #include <sys/types.h>
 #include <sys/termios.h>
 #include <sys/mman.h>
-
 struct termios original_tio;
-
-void 
-handle_interrupt(int signal)
-{
-	restore_input_buffering();
-	printf("\n");
-	exit(-2);
-}
-
 void 
 disable_input_buffering()
 {
@@ -47,6 +65,17 @@ check_key()
 	timeout.tv_usec = 0;
 	return select(1, &readfds, NULL, NULL, &timeout) != 0;
 }
+#endif
+
+void 
+handle_interrupt(int signal)
+{
+	(void)signal;
+	restore_input_buffering();
+	printf("\n");
+	exit(-2);
+}
+
 
 char *
 Read_Entire_File(char *file_name, size_t *size)
