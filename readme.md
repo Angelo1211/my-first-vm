@@ -1,5 +1,8 @@
 # I've never written a virtual machine, let's fix that.
 
+## 2022/02/02
+Ported the project to windows following the article, took like 2 minutes. Love when that happens. I wrote one more asm file. Nothing to write home about, but making progress. I do wonder if it would pay-off to skip this and go directly into a VM designed by myself. The problem is that there would be no tooling to check things, no debugger, no assembler. But somehow I find that very alluring as a project. Maybe I'll do a couple more asm exercises before commiting to something like that.
+
 ## 2022/01/29
 I've been reading about writing ASM for the VM, and its interesting. I'm finding this more challenging than writing the entire VM, probably because I don't have too much experience with ASM and also because I'm very comfortable in the land of C, but not so much in the land of ASM. I've acquired the textbook from which the lc3 spec was obtained in the article and I think I'll read the chapter about assembly in there tomorrow and write some notes about that.
 

@@ -1,5 +1,13 @@
 #include "vm.h"
 
+// -----------------------------------------------------------------------------
+// DEBUG
+// -----------------------------------------------------------------------------
+#define PRINT_REGISTERS_ON_END 1
+
+// -----------------------------------------------------------------------------
+// STATE
+// -----------------------------------------------------------------------------
 // Memory
 u16 mem[MAX_MEMORY];
 
@@ -35,11 +43,13 @@ update_flags(u16 r)
 		reg[R_COND] = FL_POS;
 }
 
+
 void 
 mem_write(u16 address, u16 val)
 {
 	mem[address] = val;
 }
+
 
 u16 
 mem_read(u16 address)
@@ -57,6 +67,8 @@ mem_read(u16 address)
 
 	return mem[address];
 }
+
+
 void 
 op_add(u16 instr)
 {
@@ -130,6 +142,7 @@ op_and(u16 instr)
 	update_flags(dr);
 }
 
+
 void
 op_not(u16 instr)
 {
@@ -143,6 +156,7 @@ op_not(u16 instr)
 
 	update_flags(dr);
 }
+
 
 void
 op_br(u16 instr)
@@ -174,12 +188,14 @@ op_br(u16 instr)
 #endif
 }
 
+
 void
 op_jmp(u16 instr)
 {
 	// Also handles the asm instruction RET, since it's just sr0 == 7
 	reg[R_PC] = reg[(instr >> 6) & 0x7];
 }
+
 
 void
 op_jsr(u16 instr)
@@ -192,6 +208,7 @@ op_jsr(u16 instr)
 	else 
 		reg[R_PC] = reg[(instr >> 6) & 0x7];
 }
+
 
 void
 op_ld(u16 instr)
@@ -207,6 +224,7 @@ op_ld(u16 instr)
 
 	update_flags(dr);
 }
+
 
 void
 op_ldr(u16 instr)
@@ -226,6 +244,7 @@ op_ldr(u16 instr)
 	update_flags(dr);
 }
 
+
 void
 op_lea(u16 instr)
 {
@@ -241,6 +260,7 @@ op_lea(u16 instr)
 	update_flags(dr);
 }
 
+
 void
 op_st(u16 instr)
 {
@@ -253,6 +273,7 @@ op_st(u16 instr)
 	// Write the data on the register to memory at address
 	mem_write(adr, reg[sr]);
 }
+
 
 void
 op_sti(u16 instr)
@@ -270,6 +291,7 @@ op_sti(u16 instr)
 	mem_write(adr1, reg[sr]);
 }
 
+
 void
 op_str(u16 instr)
 {
@@ -285,6 +307,7 @@ op_str(u16 instr)
 	// Write the data to memory
 	mem_write(adr, reg[sr0]);
 }
+
 
 void
 op_trap(u16 instr)
@@ -355,11 +378,13 @@ op_trap(u16 instr)
 	}
 }
 
+
 u16
 swap16(u16 a)
 {
 	return (a << 8) | (a >> 8);
 }
+
 
 void
 read_image_file(FILE *file)
@@ -437,6 +462,14 @@ VM_Run(void)
 int 
 VM_Shutdown(void)
 {
+#if PRINT_REGISTERS_ON_END
+	printf("\nCurrent Register State:\n");
+	for (int i = 0; i < R_COUNT;++i)
+	{
+		printf("REG_%d Value:%d\n", i, reg[i]);
+	}
+#endif
+
 	int result = 0;
 
 	return result;
